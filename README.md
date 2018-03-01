@@ -7,6 +7,7 @@ Android.
 
 ## Setup
 1. Get [an API Key](https://darksky.net/dev) for DarkSky
+    * Note: Make sure you do NOT commit private keys to public repositories
 1. Import this project into Android Studio and sync with Gradle
 1. Replace the `DARKSKY_API_KEY` in `WeatherSync.java` with your key
 1. In your `MainActivity`, instantiate a new `WeatherSync` object and use one of the methods to get your weather data. Get the endpoint with `getUrl`

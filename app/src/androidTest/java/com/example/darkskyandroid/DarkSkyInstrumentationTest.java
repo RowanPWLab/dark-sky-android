@@ -7,8 +7,12 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import org.json.JSONException;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +27,7 @@ public class DarkSkyInstrumentationTest {
     public void testDarkSkyApiCall() throws Exception {
         // Context of the app under test.
         final Context appContext = InstrumentationRegistry.getTargetContext();
+        final CountDownLatch latch = new CountDownLatch(1);
 
         final WeatherSync[] sync = new WeatherSync[1];
         sync[0] = new WeatherSync(appContext, new DownloadManager() {
@@ -32,6 +37,7 @@ public class DarkSkyInstrumentationTest {
                 DataAnalysis dataAnalysis = new DataAnalysis(appContext, sync[0]);
                 try {
                     dataAnalysis.generate();
+                    latch.countDown();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -49,5 +55,8 @@ public class DarkSkyInstrumentationTest {
         });
         final String newYorkCity = sync[0].getUrl(40.7, -70);
         sync[0].startForcedDownload(newYorkCity);
+
+        // Wait for response - 5s timeout
+        Assert.assertTrue(latch.await(5, TimeUnit.SECONDS));
     }
 }

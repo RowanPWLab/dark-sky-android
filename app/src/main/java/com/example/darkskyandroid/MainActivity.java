@@ -1,9 +1,12 @@
 package com.example.darkskyandroid;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 
 import org.json.JSONException;
@@ -29,21 +32,29 @@ public class MainActivity extends AppCompatActivity implements DownloadManager {
 
     @Override
     public void onDownloadSuccess(String response) {
-        DataAnalysis dataAnalysis = new DataAnalysis(this, mWeatherSync);
-        try {
-            dataAnalysis.generate();
-            String message = "High of " +
-                    dataAnalysis.getTemperatureAnalysis().getTempHighMax() +
-                    " and a low of " +
-                    dataAnalysis.getTemperatureAnalysis().getTempLowMax();
+        // Make sure we run on the UI thread when doing UI operations.
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DataAnalysis dataAnalysis = new DataAnalysis(MainActivity.this, mWeatherSync);
+                try {
+                    dataAnalysis.generate();
+                    String message = "High of " +
+                            dataAnalysis.getTemperatureAnalysis().getTempHighMax() +
+                            " and a low of " +
+                            dataAnalysis.getTemperatureAnalysis().getTempLowMax();
 
-            new AlertDialog.Builder(getApplicationContext())
-                    .setTitle(mWeatherSync.getCurrentSummary())
-                    .setMessage(message)
-                    .show();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+                    ContextThemeWrapper wrapper =
+                            new ContextThemeWrapper(MainActivity.this, R.style.AppTheme);
+                    new AlertDialog.Builder(wrapper)
+                            .setTitle(mWeatherSync.getCurrentSummary())
+                            .setMessage(message)
+                            .show();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Override

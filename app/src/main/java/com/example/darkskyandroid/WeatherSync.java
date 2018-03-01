@@ -36,7 +36,7 @@ public class WeatherSync {
     private Context mContext;
     private DownloadManager downloadManager;
     private SettingsManager sm;
-    private final String DARKSKY_API_KEY = "<DARK SKY API KEY>";
+    private final String DARKSKY_API_KEY = "<KEY>";
     private boolean liveWeather; // Whether this is from the time machine or not
 
     private DataAnalysis dataAnalysis3;
